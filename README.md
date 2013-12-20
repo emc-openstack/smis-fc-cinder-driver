@@ -141,3 +141,32 @@ In the above example, two volume types are created.  They are “High Performanc
 Note: Volume Type names “High Performance” and “Standard Performance” are user-defined and can be any names.  Extra spec keys “storagetype:pool” and “storagetype:provisioning” have to be the exact names listed here.  Extra spec value “smi_pool” is just your pool name.  Extra spec value for “storagetype:provisioning” has to be either “thick” or “thin”.
 The driver will look for volume type first.  If volume type is specified when creating a volume, the driver will look for volume type definition and find the matching pool and provisioning type.  If volume type is not specified, it will fall back to use the <StorageType> in cinder_emc_config.xml.
 
+Multiple Backends
+-----------------
+
+To support multiple backends, add the following in cinder.conf:
+
+enabled_backends=emc-vnx,emc-vmax
+[emc-vnx]
+volume_driver = cinder.volume.drivers.emc.emc_smis_fc.EMCSMISFCDriver
+cinder_emc_config_file = /etc/cinder/cinder_emc_config.xml
+volume_backend_name=emc-vnx
+[emc-vmax]
+volume_driver = cinder.volume.drivers.emc.emc_smis_fc.EMCSMISFCDriver
+cinder_emc_config_file = /etc/cinder/cinder_emc_config.vmax.xml
+volume_backend_name=emc-vmax
+
+Then create two volume-type referring to emc-vnx and emc-vmax:
+
+root@core:/etc/init.d# cinder extra-specs-list
++--------------------------------------+----------+---------------------------------------+
+|                  ID                  |   Name   |              extra_specs              |
++--------------------------------------+----------+---------------------------------------+
+| 42c62c3f-fd41-4eb4-afc5-584f607c52f8 | emc-vmax | {u'volume_backend_name': u'emc-vmax'} |
+| 4f8d8f90-f252-4980-ac3d-4c5a79bb9ef7 | emc-vnx  |  {u'volume_backend_name': u'emc-vnx'} |
+
+In addition to “volume_backend_name” for multiple backend support, you also need to add “storagetype:pool” to the volume-type.  “storagetype:provisioning” is optional.  By default it is thin.
+
+The following command sets pool name to “smi_pool” for volume type “Standard Performance”.
+cinder --os-username admin --os-tenant-name admin type-key "Standard Performance" set storagetype:pool=smi_pool
+
