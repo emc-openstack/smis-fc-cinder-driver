@@ -26,7 +26,9 @@ The EMC SMI-S Provider supports the SNIA Storage Management Initiative (SMI), an
 Requirements
 ------------
 
-EMC SMI-S Provider V4.5.1 and higher is required. SMI-S can be downloaded from EMC's Powerlink web site. Refer to the EMC SMI-S Provider release notes for installation instructions.
+EMC SMI-S Provider V4.5.1 and higher is required. SMI-S can be downloaded from EMC's support web site. SMI-S can be installed on a non-OpenStack host. Supported platforms include different flavors of Windows, RedHat, and SuSE Linux. Refer to the EMC SMI-S Provider release notes for supported platforms and installation instructions. Note that storage arrays have to be discovered on the SMI-S server before using Cinder Driver. Follow instructions in the release notes to discover the arrays.
+
+SMI-S is usually installed at /opt/emc/ECIM/ECOM/bin on Linux and C:\Program Files\EMC\ECIM\ECOM\bin on Windows. After installing and configuring SMI-S, go to that directory and type “TestSmiProvider.exe”. After entering the test program, type “dv” and examine the output. Make sure that the arrays are recognized by the SMI-S server before using Cinder Driver.
 
 EMC storage VMAX Family and VNX Series are supported.
 
@@ -61,7 +63,7 @@ $sudo apt-get install sysfsutils sg3-utils
 ```
 $ sudo apt-get install python-pywbem
 ```
-* Setup SMI-S. Download SMI-S from PowerLink and install it following the instructions of SMI-S release notes. Add your VNX/VMAX arrays to SMI-S following the SMI-S release notes.
+* Setup SMI-S. Download SMI-S from EMC's support website and install it following the instructions of SMI-S release notes. Add your VNX/VMAX arrays to SMI-S following the SMI-S release notes.
 * Register with VNX.
 * Create Masking View on VMAX.
 
