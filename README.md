@@ -54,12 +54,16 @@ Preparation
 -----------
 
 * Install systool and sg3-utils:
+```
 $sudo apt-get install sysfsutils sg3-utils
+```
 * Install python-pywbem package. For example:
-$sudo apt-get install python-pywbem
-*	Setup SMI-S. Download SMI-S from PowerLink and install it following the instructions of SMI-S release notes. Add your VNX/VMAX arrays to SMI-S following the SMI-S release notes.
-*	Register with VNX.
-*	Create Masking View on VMAX.
+```
+$ sudo apt-get install python-pywbem
+```
+* Setup SMI-S. Download SMI-S from PowerLink and install it following the instructions of SMI-S release notes. Add your VNX/VMAX arrays to SMI-S following the SMI-S release notes.
+* Register with VNX.
+* Create Masking View on VMAX.
 
 Register with VNX
 -----------------
@@ -77,20 +81,26 @@ Config file cinder.conf
 Make the following changes in /etc/cinder/cinder.conf.
 
 For VMAX, we have the following entries.
+```
 volume_driver = cinder.volume.drivers.emc.emc_smis_fc.EMCSMISFCDriver
 cinder_emc_config_file = /etc/cinder/cinder_emc_config.xml
-                        
+```
+
 For VNX, we have the following entries.
+```
 volume_driver = cinder.volume.drivers.emc.emc_smis_fc.EMCSMISFCDriver
 cinder_emc_config_file = /etc/cinder/cinder_emc_config.xml
-                         
+```
+
 Restart the cinder-volume service.
 
 Config file cinder_emc_config.xml
 ---------------------------------
 
 Create the file /etc/cinder/cinder_emc_config.xml. We don't need to restart service for this change.
+
 For VMAX, we have the following in the xml file:
+```
 <?xml version='1.0' encoding='UTF-8'?>
 <EMC>
 <StorageType>xxxx</StorageType>
@@ -100,8 +110,10 @@ For VMAX, we have the following in the xml file:
 <EcomUserName>xxxxxxxx</EcomUserName>
 <EcomPassword>xxxxxxxx</EcomPassword>
 </EMC>
-                        
+```
+
 For VNX, we have the following in the xml file:
+```
 <?xml version='1.0' encoding='UTF-8'?>
 <EMC>
 <StorageType>xxxx</StorageType>
@@ -110,7 +122,8 @@ For VNX, we have the following in the xml file:
 <EcomUserName>xxxxxxxx</EcomUserName>
 <EcomPassword>xxxxxxxx</EcomPassword>
 </EMC>
-                        
+```
+
 MaskingView is required for attaching VMAX volumes to an OpenStack VM. A Masking View can be created using Unisphere for VMAX. The Masking View needs to have an Initiator Group that contains the WWNs of the OpenStack compute node that hosts the VM.
 
 StorageType is the thin pool where user wants to create volume from.  Thin pools can be created using Unisphere for VMAX and VNX.  Note that the StorageType tag is not required in this Havana release. Refer to the following "Multiple Pools and Thick/Thin Provisioning" section on how to support thick/thin provisioning.
@@ -129,12 +142,14 @@ The <StorageType> tag in cinder_emc_config.xml is not mandatory.  There are two 
 
 Here is an example of how to use method 2.   First create volume types.  Then define extra specs for each volume type.
 
+```
 cinder --os-username admin --os-tenant-name admin type-create "High Performance"
 cinder --os-username admin --os-tenant-name admin type-create "Standard Performance"
 cinder --os-username admin --os-tenant-name admin type-key "High Performance" set storagetype:pool=smi_pool
 cinder --os-username admin --os-tenant-name admin type-key "High Performance" set storagetype:provisioning=thick
 cinder --os-username admin --os-tenant-name admin type-key "Standard Performance" set storagetype:pool=smi_pool
 cinder --os-username admin --os-tenant-name admin type-key "Standard Performance" set storagetype:provisioning=thin
+```
 
 In the above example, two volume types are created.  They are “High Performance” and “Standard Performance”.   For High Performance, “storagetype:pool” is set to “smi_pool” and “storagetype:provisioning” is set to “thick”.  Similarly for Standard Performance, “storagetype:pool” is set to “smi_pool” and “storagetype:provisioning” is set to “thin”.  If “storagetype:provisioning” is not specified, it will be default to thin.
 
@@ -144,8 +159,9 @@ The driver will look for volume type first.  If volume type is specified when cr
 Multiple Backends
 -----------------
 
-To support multiple backends, add the following in cinder.conf:
+Here is an example of how to support multiple backends.  To support two backends emc-vnx and emc-vmax, add the following in cinder.conf:
 
+```
 enabled_backends=emc-vnx,emc-vmax
 [emc-vnx]
 volume_driver = cinder.volume.drivers.emc.emc_smis_fc.EMCSMISFCDriver
@@ -155,18 +171,24 @@ volume_backend_name=emc-vnx
 volume_driver = cinder.volume.drivers.emc.emc_smis_fc.EMCSMISFCDriver
 cinder_emc_config_file = /etc/cinder/cinder_emc_config.vmax.xml
 volume_backend_name=emc-vmax
+```
 
 Then create two volume-type referring to emc-vnx and emc-vmax:
 
+```
 root@core:/etc/init.d# cinder extra-specs-list
 +--------------------------------------+----------+---------------------------------------+
 |                  ID                  |   Name   |              extra_specs              |
 +--------------------------------------+----------+---------------------------------------+
 | 42c62c3f-fd41-4eb4-afc5-584f607c52f8 | emc-vmax | {u'volume_backend_name': u'emc-vmax'} |
 | 4f8d8f90-f252-4980-ac3d-4c5a79bb9ef7 | emc-vnx  |  {u'volume_backend_name': u'emc-vnx'} |
+```
 
 In addition to “volume_backend_name” for multiple backend support, you also need to add “storagetype:pool” to the volume-type.  “storagetype:provisioning” is optional.  By default it is thin.
 
 The following command sets pool name to “smi_pool” for volume type “Standard Performance”.
+```
 cinder --os-username admin --os-tenant-name admin type-key "Standard Performance" set storagetype:pool=smi_pool
+```
+
 
