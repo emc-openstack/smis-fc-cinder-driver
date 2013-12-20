@@ -23,6 +23,12 @@ The EMC CIM Object Manager (ECOM) is packaged with the EMC SMI-S Provider. It is
 
 The EMC SMI-S Provider supports the SNIA Storage Management Initiative (SMI), an ANSI standard for storage management. It supports VMAX and VNX storage systems.
 
+Supported OpenStack Releases
+----------------------------
+
+* This driver supports Havana.
+* A driver that supports Grizzly can be obtained by contacting EMC.
+
 Requirements
 ------------
 
