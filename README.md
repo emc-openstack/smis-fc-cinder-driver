@@ -10,6 +10,9 @@ You may obtain a copy of the License at
 
         https://github.com/emc-openstack/freeware-eula/blob/master/Freeware_EULA_20131217_modified.md
         
+Note
+----
+The latest VMAX FC Cinder driver for Havana is at: https://github.com/emc-openstack/vmax-cinder-driver
 
 Overview
 --------
